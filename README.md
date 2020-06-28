@@ -1,3 +1,8 @@
+## Notes
+**This project is still work in progress.**
+In order for it to work .env file must be created, and it should contain api key created specifically for TMDB - [https://www.themoviedb.org/](https://www.themoviedb.org/).
+API key should be in a format: `API_KEY=mysupersecretkey`. 
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
