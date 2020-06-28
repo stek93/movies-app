@@ -1,0 +1,13 @@
+.card {
+    width: 240px;
+    background-color: transparent;
+    border-color: transparent;
+}
+
+.meta {
+    padding-left: 0 !important;
+}
+
+.title {
+    color: white;
+}

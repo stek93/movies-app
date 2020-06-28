@@ -1,0 +1,31 @@
+.title {
+    color: white;
+}
+
+.ratingIcon {
+    display: inline-block;
+    margin-left: 1em;
+    font-size: .95rem;
+}
+
+.divider {
+    padding-bottom: 1em;
+}
+
+.year {
+}
+
+.runtime {
+    text-align: right;
+}
+
+.iconText {
+    display: inline-block;
+    margin-left: .5em;
+    font-size: .95rem;
+}
+
+.lessSignificant {
+    font-size: .7rem;
+    color: #B3B3B3;
+}
