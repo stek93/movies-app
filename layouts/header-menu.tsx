@@ -7,9 +7,10 @@ const { Header } = Layout;
 
 interface IHeaderMenu {
     searchMovies: (searchTerm: string) => void
+    restartMoviesList: () => void
 }
 
-export default function HeaderMenu({ searchMovies }: IHeaderMenu) {
+export default function HeaderMenu({ searchMovies, restartMoviesList }: IHeaderMenu) {
     return (
         <Header style={ { backgroundColor: '#222222', padding: 0, lineHeight: 0 } }>
             <Row>
@@ -17,7 +18,7 @@ export default function HeaderMenu({ searchMovies }: IHeaderMenu) {
                     <Logo />
                 </Col>
                 <Col>
-                    <SearchField doSearch={searchMovies}/>
+                    <SearchField doSearch={searchMovies} emptySearch={restartMoviesList}/>
                 </Col>
             </Row>
         </Header>

@@ -4,7 +4,7 @@ import AuthService from "../services/AuthService";
 import React from "react";
 import { useRouter } from "next/router";
 import { getFavouriteMovies } from "../services/api";
-import { useAuth } from "../services/AuthContext";
+import { useUserState } from "../services/UserContext";
 import { Form, Input, SubmitButton } from 'formik-antd'
 
 
@@ -15,7 +15,7 @@ const DEFAULT_VALUES: ILogin = {
 
 export default function Login() {
     const router = useRouter();
-    const [state, dispatch] = useAuth()
+    const [state, dispatch] = useUserState()
 
     return (
         <Formik
@@ -25,7 +25,7 @@ export default function Login() {
                     if (response.success) {
                         AuthService.saveSessionID(response.session_id);
                         getFavouriteMovies(response.session_id).then(({ movies }: AppProps) => {
-                            dispatch({ type: 'setDetails', payload: { favouriteMovies: movies } })
+                            dispatch({ type: 'setFavouriteMovies', payload: { favouriteMovies: movies } })
                             router.push("/");
                         }).catch(error => console.log('ss'))
                     }

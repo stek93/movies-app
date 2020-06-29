@@ -1,13 +1,13 @@
 import React from "react";
 import '../styles/index.css';
 import { AppProps } from "next/app";
-import { AuthProvider } from "../services/AuthContext";
+import { UserProvider } from "../services/UserContext";
 
 const MoviesApp = ({ Component, pageProps }: AppProps) => {
     return (
-        <AuthProvider>
+        <UserProvider>
             <Component {...pageProps} />
-        </AuthProvider>
+        </UserProvider>
     );
 }
 

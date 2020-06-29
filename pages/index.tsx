@@ -10,7 +10,7 @@ import HeaderMenu from "../layouts/header-menu";
 import { AppRoutePaths } from "../constants/AppRoutes";
 import AuthService from "../services/AuthService";
 import { useRouter } from "next/router";
-import { useAuth } from "../services/AuthContext";
+import { useUserState } from "../services/UserContext";
 import SearchService from "../services/SearchService";
 
 const { Content } = Layout;
@@ -35,14 +35,24 @@ export const getServerSideProps = async (context: NextPageContext) => {
     }
 }
 
+const loadMoviesListDependingOnMenuItem = async (category: string, key: string): Promise<Movie[]> => {
+    if (category == AppRoutePaths.TrendingMovies) {
+        return ((await getTrendingMovies()).movies);
+    } else if (category == AppRoutePaths.TopRatedMovies) {
+        return ((await getTopRatedMovies()).movies);
+    } else if (category == AppRoutePaths.UpcomingMovies) {
+        return ((await getUpcomingMovies()).movies);
+    } else {
+        return ((await getMoviesByGenreId(key)).movies);
+    }
+}
 
 export default function Home({ movies, genres, error, authenticated }: InferGetStaticPropsType<typeof getServerSideProps>) {
     const[moviesState, setMoviesState] = useState<Movie[]>(movies);
     const [selectedGenre, setSelected] = useState<string>();
-    const [selectedCategory, setSelectedCategory] = useState<string>(AppRoutePaths.TrendingMovies);
     const [loading, setLoading] = useState<boolean>(false);
     const router = useRouter();
-    const [state, dispatch] = useAuth()
+    const [state, dispatch] = useUserState()
     
     useEffect(() => {
         if (!authenticated) {
@@ -52,17 +62,12 @@ export default function Home({ movies, genres, error, authenticated }: InferGetS
 
     const handleCategoryChange = async (category: string, key: string) => {
         setLoading(true);
+        dispatch({ type: 'setCurrentMenuItem', payload: { currentMenuKey: key, currentMenuCategory: category } })
 
-        if (category == AppRoutePaths.TrendingMovies) {
-            setMoviesState((await getTrendingMovies()).movies);
-        } else if (category == AppRoutePaths.TopRatedMovies) {
-            setMoviesState((await getTopRatedMovies()).movies);
-        } else if (category == AppRoutePaths.UpcomingMovies) {
-            setMoviesState((await getUpcomingMovies()).movies);
-        } else if (category == AppRoutePaths.FavouriteMovies) {
+        if (category == AppRoutePaths.FavouriteMovies) {
             setMoviesState(state.favouriteMovies);
         } else {
-            setMoviesState((await getMoviesByGenreId(key)).movies);
+            setMoviesState(await (loadMoviesListDependingOnMenuItem(category, key)));
         }
     }
 
@@ -71,6 +76,18 @@ export default function Home({ movies, genres, error, authenticated }: InferGetS
             setMoviesState((await SearchService.doSearch(searchTerm)))
         } catch (e) {
             console.log(e);
+        }
+    }
+
+    const handleMoviesListReAppear = async () => {
+        try {
+            if(state.currentMenuCategory == AppRoutePaths.FavouriteMovies) {
+                setMoviesState(state.favouriteMovies);
+            } else {
+                setMoviesState(await (loadMoviesListDependingOnMenuItem(state.currentMenuCategory, state.currentMenuKey)));
+            }
+        } catch (e) {
+            console.log(e)
         }
     }
 
@@ -89,7 +106,7 @@ export default function Home({ movies, genres, error, authenticated }: InferGetS
                 </Head>
                 <main>
                     <Layout style={ { minHeight: '100vh' } }>
-                        <HeaderMenu  searchMovies={handleMoviesSearch}/>
+                        <HeaderMenu  searchMovies={handleMoviesSearch} restartMoviesList={handleMoviesListReAppear}/>
                         <Layout className="site-layout">
                             <SideMenu changeCategory={handleCategoryChange} genres={genres}/>
                             <Content>
