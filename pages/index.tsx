@@ -11,6 +11,7 @@ import { AppRoutePaths } from "../constants/AppRoutes";
 import AuthService from "../services/AuthService";
 import { useRouter } from "next/router";
 import { useAuth } from "../services/AuthContext";
+import SearchService from "../services/SearchService";
 
 const { Content } = Layout;
 
@@ -65,6 +66,14 @@ export default function Home({ movies, genres, error, authenticated }: InferGetS
         }
     }
 
+    const handleMoviesSearch = async (searchTerm: string) => {
+        try {
+            setMoviesState((await SearchService.doSearch(searchTerm)))
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
 
     if (error.isError) {
         // FIXME handle this the right way
@@ -80,7 +89,7 @@ export default function Home({ movies, genres, error, authenticated }: InferGetS
                 </Head>
                 <main>
                     <Layout style={ { minHeight: '100vh' } }>
-                        <HeaderMenu />
+                        <HeaderMenu  searchMovies={handleMoviesSearch}/>
                         <Layout className="site-layout">
                             <SideMenu changeCategory={handleCategoryChange} genres={genres}/>
                             <Content>

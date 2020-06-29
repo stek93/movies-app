@@ -40,7 +40,7 @@ export default function MovieCard({ movie }: IMovie) {
                     className={styles.card}
                     cover={ <img alt={ movie.title } src={ `${PHOTOS_BASE_URL}/${PHOTO_CARD_SIZE}${movie.poster_path}?api_key=${API_KEY}` }/> }>
                     <div className={styles.meta}>
-                        <Meta className={styles.meta} title={ <span className={styles.title}>{movie.title}</span> } description={ movie.release_date.split('-')[0] } />
+                        <Meta className={styles.meta} title={ <span className={styles.title}>{movie.title}</span> } description={ movie.release_date?.split('-')[0] } />
                     </div>
                 </Card>
             </Badge>

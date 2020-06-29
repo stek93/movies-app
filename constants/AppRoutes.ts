@@ -9,6 +9,7 @@ export enum AppRoutes {
     UpcomingMoviesURI = "/movie/upcoming",
     DiscoverMoviesURI = "/discover/movie",
     FavouriteMoviesURI = "/account/{account_id}/favorite/movies",
+    SearchMoviesURI = "/search/movie",
 }
 
 export enum AppRoutePaths {

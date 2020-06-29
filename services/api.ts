@@ -11,7 +11,7 @@ const UPCOMING_MOVIES = AppRoutes.UpcomingMoviesURI;
 const DISCOVER_MOVIES = AppRoutes.DiscoverMoviesURI;
 const FAVOURITE_MOVIES = AppRoutes.FavouriteMoviesURI;
 
-const axiosInstance: AxiosInstance = axios.create({
+export const axiosInstance: AxiosInstance = axios.create({
     baseURL: MOVIES_BASE_URL,
     params: {
         api_key: API_KEY
@@ -162,6 +162,48 @@ export async function getFavouriteMovies(sessionID: string): Promise<AppProps> {
                 session_id: sessionID
             }
         })).data.results;
+    } catch (e) {
+        error.isError = true;
+    }
+
+    return {
+        movies,
+        error,
+    }
+}
+
+export async function discoverMovies(query: Object): Promise<AppProps> {
+    let movies: Movie[] = [];
+    let error: ApiError = {
+        isError: false
+    };
+
+    try {
+        movies = (await axiosInstance.get<MoviesResponse>(DISCOVER_MOVIES, {
+            params: query
+        })).data.results;
+    } catch (e) {
+        error.isError = true;
+    }
+
+    return {
+        movies,
+        error,
+    }
+}
+
+export async function searchMovies(searchTerm: string): Promise<AppProps> {
+    let movies: Movie[] = [];
+    let error: ApiError = {
+        isError: false
+    };
+
+    try {
+        movies = (await axiosInstance.get<MoviesResponse>(AppRoutes.SearchMoviesURI, {
+            params: {
+                query: searchTerm
+            }
+        })).data.results.sort((a, b) => b.vote_average - a.vote_average);
     } catch (e) {
         error.isError = true;
     }
