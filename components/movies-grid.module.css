@@ -1,0 +1,18 @@
+.loadingBarRow {
+    height: 100vh;
+}
+
+.loadingBar {
+    font-size: 5vw;
+}
+
+.loadMoreDiv {
+    text-align: center;
+    margin-top: 2vh;
+}
+
+.loadMoreBtn {
+    background-color: #2B363C;
+    border: none;
+    color: #B1B1B1;
+}

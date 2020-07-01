@@ -3,13 +3,12 @@ import { AppProps, Movie } from "../../constants/types";
 import { getMovieById, getTrendingMovies } from "../../services/api";
 import { Col, Divider, Row } from "antd";
 import Head from "next/head";
-import React, { useEffect } from "react";
+import React from "react";
 import MovieCast from "../../components/movie-cast";
 import MoviesRecommendations from "../../components/movies-recommendations";
 import { AppRoutes } from "../../constants/AppRoutes";
 import MovieShortOverview from "../../components/movie-short-overview";
 import MovieOverview from "../../components/movie-overview";
-import AuthService from "../../services/AuthService";
 import { useRouter } from "next/router";
 
 const API_KEY = process.env.API_KEY;
@@ -29,7 +28,7 @@ export const getStaticProps: GetStaticProps = async (context: any) => {
 }
 
 export const getStaticPaths = async () => {
-    const popularMovies: Movie[] = (await getTrendingMovies()).movies;
+    const popularMovies: Movie[] = (await getTrendingMovies()).moviesResponse.results;
 
     return {
         paths: popularMovies.map(movie => `/movies/${movie.id}`),

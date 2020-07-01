@@ -1,31 +1,56 @@
 import React from "react";
-import { Movie } from "../constants/types";
-import { List } from "antd";
+import { Movie, MoviesResponse } from "../constants/types";
+import { Button, Col, List, Row, Spin } from "antd";
 import MovieCard from "./movie-card";
+import { LoadingOutlined } from "@ant-design/icons";
+import styles from './movies-grid.module.css';
 
 interface IMoviesGrid {
-    movies: Movie[];
+    moviesResponse: MoviesResponse;
+    loadMoreItems: () => void;
+    currentPage: number;
+    pageLoading: boolean;
+    buttonLoading: boolean;
+    loadMovie: () => void;
 }
 
-export default function MoviesGrid(data: IMoviesGrid) {
+export default function MoviesGrid({ moviesResponse, loadMoreItems, currentPage, pageLoading, buttonLoading, loadMovie } : IMoviesGrid) {
+    const movies: Movie[] = moviesResponse?.results;
+    const remainingPages = moviesResponse?.total_pages - currentPage;
+    const loadMore = remainingPages > 0 ? (
+        <div className={styles.loadMoreDiv}>
+            <Button className={styles.loadMoreBtn} onClick={() => loadMoreItems()} loading={buttonLoading}>Load more</Button>
+        </div>
+    ) : null;
 
-    return (
+    const loadingBar = (
+        <Row align="middle" justify="center" className={styles.loadingBarRow}>
+            <Col>
+                <Spin indicator={
+                    <LoadingOutlined className={styles.loadingBar} spin />}
+                />
+            </Col>
+        </Row>);
+
+    const moviesList = (
         <List
             grid={ {
                 gutter: 16,
-                xs: 1,
-                sm: 2,
+                sm: 1,
                 md: 3,
-                lg: 3,
-                xl: 3,
-                xxl: 5,
+                xxl: 5
             } }
-            dataSource={ data.movies }
+            loadMore={loadMore}
+            dataSource={ movies }
             renderItem={ movie => (
                 <List.Item>
-                    <MovieCard movie={movie} key={movie.id}/>
+                    <MovieCard movie={movie} key={movie.id} loadMovie={loadMovie} />
                 </List.Item>
             ) }
         />
+    );
+
+    return (
+        pageLoading ? loadingBar : moviesList
     );
 }

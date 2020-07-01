@@ -16,12 +16,19 @@ export interface SessionToken {
 }
 
 export interface AppProps {
-    movies?: Movie[],
+    moviesResponse?: MoviesResponse,
     movie?: Movie,
     genres?: Genre[],
     error: ApiError,
     dates?: UpcomingDate,
-    authenticated?: boolean
+    authenticated?: boolean,
+    currentSearchContext?: Search
+}
+
+export interface Search {
+    searchType?: string
+    query?: Object,
+    searchTerm?: string
 }
 
 export interface ApiError {

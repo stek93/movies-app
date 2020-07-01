@@ -12,12 +12,12 @@ interface IHeaderMenu {
 
 export default function HeaderMenu({ searchMovies, restartMoviesList }: IHeaderMenu) {
     return (
-        <Header style={ { backgroundColor: '#222222', padding: 0, lineHeight: 0 } }>
-            <Row>
+        <Header style={ { backgroundColor: '#2B363C', padding: 0, lineHeight: 0 } }>
+            <Row align="middle">
                 <Col span={2}>
                     <Logo />
                 </Col>
-                <Col>
+                <Col span={6} offset={8}>
                     <SearchField doSearch={searchMovies} emptySearch={restartMoviesList}/>
                 </Col>
             </Row>

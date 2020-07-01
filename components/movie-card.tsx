@@ -1,5 +1,5 @@
 import React from "react";
-import { Badge, Card } from "antd";
+import { Badge, Card, Spin } from "antd";
 import { Movie } from "../constants/types";
 import styles from './movie-card.module.css';
 import Link from "next/link";
@@ -12,10 +12,11 @@ const PHOTO_CARD_SIZE = "w342";
 const { Meta } = Card;
 
 interface IMovie {
-    movie: Movie
+    movie: Movie;
+    loadMovie: () => void;
 }
 
-export default function MovieCard({ movie }: IMovie) {
+export default function MovieCard({ movie, loadMovie }: IMovie) {
 
     let averageCount: number | string;
     if (movie.vote_average) {
@@ -31,19 +32,21 @@ export default function MovieCard({ movie }: IMovie) {
         countColor = 'green';
     }
 
-
     return (
-        <Link href="/movies/[id]" as={`/movies/${movie.id}`}>
-            <Badge count={ averageCount } offset={ [ -120, 0 ] } style={ { backgroundColor: countColor } }>
+        <Badge count={ averageCount } offset={ [ -120, 0 ] } style={ { backgroundColor: countColor } }>
+            <Link href="/movies/[id]" as={`/movies/${movie.id}`}>
                 <Card
+                    onClick={() => loadMovie()}
                     hoverable
                     className={styles.card}
                     cover={ <img alt={ movie.title } src={ `${PHOTOS_BASE_URL}/${PHOTO_CARD_SIZE}${movie.poster_path}?api_key=${API_KEY}` }/> }>
-                    <div className={styles.meta}>
-                        <Meta className={styles.meta} title={ <span className={styles.title}>{movie.title}</span> } description={ movie.release_date?.split('-')[0] } />
+                    <div>
+                        <Meta
+                          title={<span className={styles.title}>{movie.title}</span>}
+                        />
                     </div>
                 </Card>
-            </Badge>
-        </Link>
+            </Link>
+        </Badge>
     );
 }

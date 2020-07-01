@@ -1,12 +1,7 @@
 @import '~antd/dist/antd.css';
 
-#components-layout-demo-side .logo {
-    height: 32px;
-    background: rgba(255, 255, 255, 0.2);
-    margin: 16px;
-}
-
 .site-layout .site-layout-background {
-    background: #181818;
+    background: #18232B;
     padding: 2em 4em;
+    min-height: 100vh;
 }

@@ -3,54 +3,69 @@ import React, { useEffect, useState } from "react";
 import SideMenu from "../layouts/side-menu";
 import { Layout } from 'antd';
 import { InferGetStaticPropsType, NextPageContext } from "next";
-import { AppProps, Movie } from "../constants/types";
+import { AppProps, MoviesResponse, Search } from "../constants/types";
 import MoviesGrid from "../components/movies-grid";
-import { getGenres, getMoviesByGenreId, getTopRatedMovies, getTrendingMovies, getUpcomingMovies } from "../services/api";
+import { discoverMovies, getFavouriteMovies, getGenres, getMoviesByGenreId, getTopRatedMovies, getTrendingMovies, getUpcomingMovies, searchMovies } from "../services/api";
 import HeaderMenu from "../layouts/header-menu";
 import { AppRoutePaths } from "../constants/AppRoutes";
 import AuthService from "../services/AuthService";
 import { useRouter } from "next/router";
 import { useUserState } from "../services/UserContext";
 import SearchService from "../services/SearchService";
+import LoadingModal from "../components/loading-modal";
 
 const { Content } = Layout;
 
 export const getServerSideProps = async (context: NextPageContext) => {
     const authenticated = AuthService.isAuthenticated(context);
 
-    const responseMovies: AppProps = await getTrendingMovies();
-    const responseGenres: AppProps = await getGenres();
+    const moviesResponse: AppProps = await getTrendingMovies();
+    const genresResponse: AppProps = await getGenres();
 
     const error = {
-        isError: responseGenres.error.isError && responseMovies.error.isError
+        isError: genresResponse.error.isError && moviesResponse.error.isError
     };
 
     return {
         props: {
-            movies: responseMovies.movies,
-            genres: responseGenres.genres,
+            moviesResponse: moviesResponse.moviesResponse,
+            genres: genresResponse.genres,
             error: error,
             authenticated
         }
     }
 }
 
-const loadMoviesListDependingOnMenuItem = async (category: string, key: string): Promise<Movie[]> => {
+const loadMoviesListDependingOnMenuItem = async (category: string, key: string, page: number): Promise<MoviesResponse> => {
     if (category == AppRoutePaths.TrendingMovies) {
-        return ((await getTrendingMovies()).movies);
+        return ((await getTrendingMovies(page)).moviesResponse);
     } else if (category == AppRoutePaths.TopRatedMovies) {
-        return ((await getTopRatedMovies()).movies);
+        return ((await getTopRatedMovies(page)).moviesResponse);
     } else if (category == AppRoutePaths.UpcomingMovies) {
-        return ((await getUpcomingMovies()).movies);
+        return ((await getUpcomingMovies(page)).moviesResponse);
+    } else if (category == AppRoutePaths.FavouriteMovies) {
+        return ((await getFavouriteMovies(page)).moviesResponse);
     } else {
-        return ((await getMoviesByGenreId(key)).movies);
+        return ((await getMoviesByGenreId(key, page)).moviesResponse);
     }
 }
 
-export default function Home({ movies, genres, error, authenticated }: InferGetStaticPropsType<typeof getServerSideProps>) {
-    const[moviesState, setMoviesState] = useState<Movie[]>(movies);
-    const [selectedGenre, setSelected] = useState<string>();
-    const [loading, setLoading] = useState<boolean>(false);
+const loadMoreMoviesFromCurrentSearch = async (searchType: string, search: Search, page: number): Promise<MoviesResponse> => {
+    if (searchType == AppRoutePaths.DiscoverMovies) {
+        return ((await discoverMovies(search.query, page)).moviesResponse);
+    } else {
+        return ((await searchMovies(search.searchTerm, page)).moviesResponse);
+    }
+}
+
+export default function Home({ moviesResponse, genres, authenticated, error }: InferGetStaticPropsType<typeof getServerSideProps>) {
+    const DEFAULT_PAGE: number = 1;
+
+    const[moviesState, setMoviesState] = useState<MoviesResponse>(moviesResponse);
+    const [pageLoading, setPageLoading] = useState<boolean>(true);
+    const [buttonLoading, setButtonLoading] = useState<boolean>(false);
+    const [movieLoading, setMovieLoading] = useState<boolean>(false);
+    const [currentPage, setCurrentPage] = useState<number>(DEFAULT_PAGE);
     const router = useRouter();
     const [state, dispatch] = useUserState()
     
@@ -58,50 +73,100 @@ export default function Home({ movies, genres, error, authenticated }: InferGetS
         if (!authenticated) {
             router.push("/login")
         }
+        setPageLoading(false);
     }, []);
 
-    const handleCategoryChange = async (category: string, key: string) => {
-        setLoading(true);
-        dispatch({ type: 'setCurrentMenuItem', payload: { currentMenuKey: key, currentMenuCategory: category } })
-
-        if (category == AppRoutePaths.FavouriteMovies) {
-            setMoviesState(state.favouriteMovies);
-        } else {
-            setMoviesState(await (loadMoviesListDependingOnMenuItem(category, key)));
+    useEffect(() => {
+        if (state.search.searchType) {
+            loadMoreMoviesFromCurrentSearch(state.search.searchType, state.search, currentPage).then(response => {
+                const newMovies = {
+                    ...moviesState,
+                    results: [...moviesState.results].concat(response.results)
+                }
+                setMoviesState(newMovies);
+                setButtonLoading(false);
+            }).catch(error => console.log(error));
+        } else if (currentPage != DEFAULT_PAGE){
+            loadMoviesListDependingOnMenuItem(state.category, state.key, currentPage).then(response => {
+                const newMovies = {
+                    ...moviesState,
+                    results: [...moviesState.results].concat(response.results)
+                }
+                setMoviesState(newMovies);
+                setButtonLoading(false);
+            }).catch(error => console.log(error));
         }
+
+    }, [currentPage]);
+
+    const handleCategoryChange = async (category: string, key: string) => {
+        setPageLoading(true);
+        dispatch({ type: 'setCurrentMovieCategory', payload: { key, category } })
+        setMoviesState({});
+        setCurrentPage(DEFAULT_PAGE)
+        setMoviesState(await (loadMoviesListDependingOnMenuItem(category, key, DEFAULT_PAGE)));
+        setPageLoading(false);
     }
 
     const handleMoviesSearch = async (searchTerm: string) => {
+        setPageLoading(true);
         try {
-            setMoviesState((await SearchService.doSearch(searchTerm)))
+            let searchResponse:AppProps = (await SearchService.doSearch(searchTerm));
+            const search: Search = {
+                searchType: searchResponse.currentSearchContext.searchType,
+                query: searchResponse.currentSearchContext.query,
+                searchTerm: searchResponse.currentSearchContext.searchTerm
+            };
+
+            dispatch({ type: 'setCurrentSearchContext', payload: { search } })
+            setMoviesState(searchResponse.moviesResponse);
+            setCurrentPage(DEFAULT_PAGE);
+            setPageLoading(false);
         } catch (e) {
             console.log(e);
         }
     }
 
     const handleMoviesListReAppear = async () => {
+        setPageLoading(true);
+        const search: Search = {
+            searchType: null,
+            query: null,
+            searchTerm: null,
+        };
+        dispatch({ type: 'setCurrentSearchContext', payload: { search } })
+        setCurrentPage(DEFAULT_PAGE);
         try {
-            if(state.currentMenuCategory == AppRoutePaths.FavouriteMovies) {
+            if(state.category == AppRoutePaths.FavouriteMovies) {
                 setMoviesState(state.favouriteMovies);
             } else {
-                setMoviesState(await (loadMoviesListDependingOnMenuItem(state.currentMenuCategory, state.currentMenuKey)));
+                setMoviesState(await (loadMoviesListDependingOnMenuItem(state.category, state.key, DEFAULT_PAGE)));
             }
+            setPageLoading(false);
         } catch (e) {
             console.log(e)
         }
     }
 
-
-    if (error.isError) {
-        // FIXME handle this the right way
-        console.log('Errror');
+    const handleLoadMoreMovies = async () => {
+        setButtonLoading(true);
+        setCurrentPage(prevState => prevState + 1);
     }
+
+    const handleMovieLoad = () => {
+        setMovieLoading(true);
+    }
+
+    // if (error.isError) {
+    //     // FIXME handle this the right way
+    //     console.log('Errror');
+    // }
 
     return (
         <>
             <div className="container">
                 <Head>
-                    <title>Movies App</title>
+                    <title>Space Movies</title>
                     <link rel="icon" href="/favicon.ico"/>
                 </Head>
                 <main>
@@ -111,7 +176,15 @@ export default function Home({ movies, genres, error, authenticated }: InferGetS
                             <SideMenu changeCategory={handleCategoryChange} genres={genres}/>
                             <Content>
                                 <div className="site-layout-background">
-                                    <MoviesGrid movies={moviesState} />
+                                    <LoadingModal visible={movieLoading} />
+                                    <MoviesGrid
+                                        pageLoading={pageLoading}
+                                        buttonLoading={buttonLoading}
+                                        moviesResponse={moviesState}
+                                        currentPage={currentPage}
+                                        loadMoreItems={handleLoadMoreMovies}
+                                        loadMovie={handleMovieLoad}
+                                    />
                                 </div>
                             </Content>
                         </Layout>

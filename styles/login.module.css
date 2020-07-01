@@ -1,0 +1,13 @@
+.loginRow {
+    height: 100vh;
+    background-color: #18232B;
+}
+
+.loginBtn {
+    margin-top: 1em;
+    width: 100%;
+}
+
+.loginInput {
+    font-weight: bold !important;
+}

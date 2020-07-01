@@ -17,5 +17,7 @@ export enum AppRoutePaths {
     TopRatedMovies = "Top Rated",
     UpcomingMovies = "Upcoming",
     FavouriteMovies = "Favourites",
-    MovieGenres = "Genres"
+    MovieGenres = "Genres",
+    DiscoverMovies = "Discover",
+    SearchMovies = "Search",
 }

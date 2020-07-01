@@ -50,6 +50,11 @@ class AuthService {
 
         return sessionID != null;
     }
+
+    public getSessionIDFromCookie(): string {
+        const cookies = new Cookies();
+        return cookies.get(COOKIE_KEY);
+    }
 }
 
 export default new AuthService();

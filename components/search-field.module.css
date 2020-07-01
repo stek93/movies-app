@@ -1,0 +1,14 @@
+.searchField {
+    background-color: #131313;
+    border: none;
+}
+
+.searchField input {
+    background-color: #131313;
+    color: #B1B1B1;
+    margin-left: 1em;
+}
+
+.searchIcon {
+    color: #B1B1B1;
+}
