@@ -1,0 +1,9 @@
+.siteLayout .siteLayoutBackground {
+    background: #18232B;
+    padding: 2em 4em;
+    min-height: 100vh;
+}
+
+.layout {
+    min-height: 100vh;
+}

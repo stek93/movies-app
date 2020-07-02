@@ -1,18 +1,16 @@
 .title {
+    font-size: 1.5vw;
     color: white;
 }
 
 .ratingIcon {
     display: inline-block;
     margin-left: 1em;
-    font-size: .95rem;
+    font-size: .95vw;
 }
 
 .divider {
     padding-bottom: 1em;
-}
-
-.year {
 }
 
 .runtime {
@@ -22,10 +20,10 @@
 .iconText {
     display: inline-block;
     margin-left: .5em;
-    font-size: .95rem;
+    font-size: .95vw;
 }
 
 .lessSignificant {
-    font-size: .7rem;
+    font-size: .5vw;
     color: #B3B3B3;
 }

@@ -1,5 +1,5 @@
 import React from "react";
-import '../styles/index.css';
+import '../styles/global.css';
 import { AppProps } from "next/app";
 import { UserProvider } from "../services/UserContext";
 

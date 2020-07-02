@@ -9,7 +9,7 @@ const PHOTOS_BASE_URL = AppRoutes.PhotosBaseURL;
 const PHOTO_CARD_SIZE = "w342";
 
 interface IMovieThumbnail {
-    movie: Movie
+    movie: Movie;
 }
 
 export default function MovieThumbnail({movie}: IMovieThumbnail) {

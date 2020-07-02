@@ -1,9 +1,8 @@
 import React, { useContext, useReducer } from "react";
-import { Movie, Search } from "../constants/types";
+import { Search } from "../constants/types";
 import { AppRoutePaths } from "../constants/AppRoutes";
 
 export interface LoggedUserState {
-    favouriteMovies?: Movie[],
     key?: string,
     category?: string,
     isSearch?: boolean,
@@ -12,7 +11,6 @@ export interface LoggedUserState {
 }
 
 enum ActionType {
-    SetFavouriteMovies = 'setFavouriteMovies',
     SetCurrentMovieCategory = 'setCurrentMovieCategory',
     SetCurrentSearchContext = 'setCurrentSearchContext',
 }
@@ -25,7 +23,6 @@ interface IAction {
 export const UserStateContext = React.createContext({});
 
 const initialState: LoggedUserState = {
-    favouriteMovies: [],
     key: "1",
     category: AppRoutePaths.TrendingMovies,
     search: {
@@ -35,11 +32,6 @@ const initialState: LoggedUserState = {
 
 const reducer: React.Reducer<{}, IAction> = (state, action) => {
     switch (action.type) {
-        case ActionType.SetFavouriteMovies:
-            return {
-                ...state,
-                favouriteMovies: action.payload.favouriteMovies
-            }
         case ActionType.SetCurrentMovieCategory:
             return {
                 ...state,

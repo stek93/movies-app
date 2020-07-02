@@ -1,4 +1,4 @@
-import axios, { AxiosInstance } from "axios";
+import axios, { AxiosInstance, AxiosResponse } from "axios";
 import { ApiError, AppProps, Genre, GenresResponse, Movie, MoviesResponse, TimeWindow, UpcomingDate } from "../constants/types";
 import { AppRoutes } from "../constants/AppRoutes";
 import AuthService from "./AuthService";
@@ -175,6 +175,56 @@ export async function getFavouriteMovies(page: number = 1): Promise<AppProps> {
         moviesResponse,
         error,
     }
+}
+
+export async function markMovieAsFavourite(favourite: boolean, movieId: number): Promise<number> {
+    const axiosInstance = axios.create({
+        baseURL: MOVIES_BASE_URL,
+        params: {
+            api_key: API_KEY,
+            session_id: AuthService.getSessionIDFromCookie()
+        }
+    });
+
+    const options = {
+        headers: { 'content-type': 'application/json;charset=utf-8' }
+    };
+
+    const content = {
+        media_type: "movie",
+        favorite: favourite,
+        media_id: movieId
+    };
+
+    try {
+        (await axiosInstance.post<number>(AppRoutes.MarkMovieAsFavouriteURI, content, options)).data;
+    } catch (e) {
+        return e.status;
+    }
+}
+
+export async function findFavouriteByMovieId(movieId: number): Promise<Movie> {
+    let pageNumber: number = 1;
+    let found: boolean = false;
+    let targetMovie: Movie = null;
+    let noMorePages = false;
+    try {
+        while (!found && !noMorePages) {
+            const response = (await getFavouriteMovies(pageNumber)).moviesResponse;
+            noMorePages = (response.total_pages - pageNumber) >= 0;
+            response.results.forEach(movie => {
+                if (movie.id == movieId) {
+                    found = true;
+                    targetMovie = movie;
+                }
+            });
+            pageNumber++;
+        }
+    } catch (e) {
+        console.log(e);
+    }
+
+    return targetMovie;
 }
 
 export async function discoverMovies(query: Object, page: number = 1): Promise<AppProps> {

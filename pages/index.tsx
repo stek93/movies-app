@@ -13,6 +13,7 @@ import { useRouter } from "next/router";
 import { useUserState } from "../services/UserContext";
 import SearchService from "../services/SearchService";
 import LoadingModal from "../components/loading-modal";
+import styles from '../styles/index.module.css';
 
 const { Content } = Layout;
 
@@ -67,7 +68,7 @@ export default function Home({ moviesResponse, genres, authenticated, error }: I
     const [movieLoading, setMovieLoading] = useState<boolean>(false);
     const [currentPage, setCurrentPage] = useState<number>(DEFAULT_PAGE);
     const router = useRouter();
-    const [state, dispatch] = useUserState()
+    const [state, dispatch] = useUserState();
     
     useEffect(() => {
         if (!authenticated) {
@@ -137,11 +138,7 @@ export default function Home({ moviesResponse, genres, authenticated, error }: I
         dispatch({ type: 'setCurrentSearchContext', payload: { search } })
         setCurrentPage(DEFAULT_PAGE);
         try {
-            if(state.category == AppRoutePaths.FavouriteMovies) {
-                setMoviesState(state.favouriteMovies);
-            } else {
-                setMoviesState(await (loadMoviesListDependingOnMenuItem(state.category, state.key, DEFAULT_PAGE)));
-            }
+            setMoviesState(await (loadMoviesListDependingOnMenuItem(state.category, state.key, DEFAULT_PAGE)));
             setPageLoading(false);
         } catch (e) {
             console.log(e)
@@ -164,18 +161,18 @@ export default function Home({ moviesResponse, genres, authenticated, error }: I
 
     return (
         <>
-            <div className="container">
+            <div>
                 <Head>
                     <title>Space Movies</title>
                     <link rel="icon" href="/favicon.ico"/>
                 </Head>
                 <main>
-                    <Layout style={ { minHeight: '100vh' } }>
-                        <HeaderMenu  searchMovies={handleMoviesSearch} restartMoviesList={handleMoviesListReAppear}/>
-                        <Layout className="site-layout">
+                    <Layout className={styles.layout}>
+                        <HeaderMenu  searchMovies={handleMoviesSearch} restartMoviesList={handleMoviesListReAppear} showSearchBar/>
+                        <Layout className={styles.siteLayout}>
                             <SideMenu changeCategory={handleCategoryChange} genres={genres}/>
                             <Content>
-                                <div className="site-layout-background">
+                                <div className={styles.siteLayoutBackground}>
                                     <LoadingModal visible={movieLoading} />
                                     <MoviesGrid
                                         pageLoading={pageLoading}

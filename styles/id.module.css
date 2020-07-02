@@ -1,0 +1,23 @@
+.mainLayout {
+    min-height: 100vh;
+    background-color: black;
+    color: white;
+}
+
+.contentLayout {
+    min-height: 100vh;
+    background-color: black;
+}
+
+.mainRow {
+    background-size: cover;
+    height: 46vh;
+}
+
+.imgContainer {
+    height: 100%;
+}
+
+.img {
+    width: 12vw;
+}
