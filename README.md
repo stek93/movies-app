@@ -10,7 +10,7 @@ Main part:
 
 Details about movie:
 
-![Movie details](https://drive.google.com/file/d/1-uOwnDXo69wGPJ3f4qe8R5ORsoQkW0HN/view?usp=sharing)
+![Movie details](https://drive.google.com/file/d/1-uOwnDXo69wGPJ3f4qe8R5ORsoQkW0HN/view)
 
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
